@@ -22,6 +22,11 @@ export const ProductList: React.FC = React.memo(() => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(0);
+  const [amountContent] = useState<number>(8)
+  const [minContent, setMinContent] = useState<number>(0);
+  const [maxContent, setMaxContent] = useState<number>(amountContent);
+  const [totalPage, setTotalPage] = useState<number>(0);
 
   // TODO: Implement useCartDispatch hook
   const dispatch = useCartDispatch();
@@ -30,8 +35,10 @@ export const ProductList: React.FC = React.memo(() => {
     // TODO: Implement loadProducts function to fetch products
     const loadProducts = async () => {
       try {
-        const productList = await fetchProducts();
-        setProducts(productList);
+        setLoading(true)
+        const productList = await fetchProducts(minContent, maxContent);
+        setTotalPage(productList.amount_all)
+        setProducts(productList.products);
       } catch (err) {
         setError(true);
         console.log(err);
@@ -41,22 +48,34 @@ export const ProductList: React.FC = React.memo(() => {
     };
 
     loadProducts();
-  }, []);
+  }, [page]);
+  
+  
+  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
+    setMinContent((value - 1) * amountContent)
+    setMaxContent(value * amountContent)
+    setPage(value);
+  };
+
 
   // TODO: Implement addToCart function
   const addProductToCart = (product: Product) => {
     dispatch({ type: 'ADD_ITEM', payload: product });
-  };
+  };  
+
 
   // TODO: Implement loading state UI
   if (loading) {
-    return <CircularProgress />;
+    return <CircularProgress/>;
   }
+
 
   // TODO: Implement error state UI
   if (error) {
     return <Alert severity="error">Error loading products</Alert>;
   }
+
+
 
   return (
     <Grid container spacing={4}>
@@ -64,14 +83,14 @@ export const ProductList: React.FC = React.memo(() => {
         /* TODO: Map through products and render product cards */
         products.length > 0 ? (
           products.map((product: Product, index: Key) => (
-            <Grid item key={index} xs={6} md={3}>
+            <Grid item key={index} xs={6} md={3} >
               <Card variant="outlined">
                 <CardMedia
-                  component="img"
-                  image={product.image}
+                  sx={{ p: 3, display: 'flex', justifyContent: "center", alignContent: "center" }}
+                  component={"img"}
+                  src={product.image}
                   alt={product.name}
                 />
-                <img src={product.image} alt="" width="100" />
                 <CardContent>
                   <Typography>{product.name}</Typography>
                   <Typography>{`$${product.price.toFixed(2)}`}</Typography>
@@ -91,7 +110,14 @@ export const ProductList: React.FC = React.memo(() => {
           <Typography>ยังไม่มี product</Typography>
         )
       }
-      <Pagination count={10} variant="outlined" />
+      <Pagination
+        sx={{ width: "100%", pt: 1, display: 'flex', justifyContent: "center" }}
+        count={Math.ceil(totalPage / amountContent)}
+        variant="outlined"
+        onChange={handleChangePage}
+        page={page}
+        defaultPage={1}
+      />
     </Grid>
   );
 });

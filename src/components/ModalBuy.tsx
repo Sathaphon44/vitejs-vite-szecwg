@@ -8,6 +8,7 @@ import {
 import Modal from '@mui/material/Modal';
 import { CartItem } from '../types';
 import ListItemText from '@mui/material/ListItemText/ListItemText';
+import { Key } from 'react';
 
 interface ModalBuyProps {
   items: CartItem[];
@@ -39,9 +40,9 @@ export const ModalBuy: React.FC<ModalBuyProps> = ({
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        {items.map((product: CartItem) => {
+        {items.map((product: CartItem, index: Key) => {
           return (
-            <ListItem>
+            <ListItem key={index}>
               <ListItemText>{product.name}</ListItemText>
               <ListItemText>{product.price}</ListItemText>
             </ListItem>

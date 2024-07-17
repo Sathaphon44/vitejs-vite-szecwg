@@ -32,12 +32,12 @@ function App() {
       <CssBaseline />
       {/* TODO: Implement CartProvider */}
       <CartProvider>
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ pb: 5}}>
           <Typography variant="h3" component="h1" gutterBottom sx={{ my: 4 }}>
             Our Store
           </Typography>
           <Grid container spacing={4}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={8} >
               <Typography variant="h5" gutterBottom>
                 Products
               </Typography>

@@ -9,6 +9,12 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export interface ProductAll {
+  products: Product[]
+  amount_all: number
+}
+
+
 export type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
   | { type: 'REMOVE_ITEM'; payload: number }

@@ -1,6 +1,6 @@
 // src/services/api.ts
 
-import { Product } from '../types';
+import { Product, ProductAll } from '../types';
 
 const mockProducts: Product[] = [
   {
@@ -115,12 +115,19 @@ const mockProducts: Product[] = [
     image:
       'https://www.lg.com/ph/images/washing-machines/md07556668/gallery1/D-2.jpg',
   },
+  {
+    id: 17,
+    name: 'Washing Machine4',
+    price: 2000,
+    image:
+      'https://www.lg.com/ph/images/washing-machines/md07556668/gallery1/D-2.jpg',
+  },
 ];
 
-export const fetchProducts = (): Promise<Product[]> => {
+export const fetchProducts = (minPage: number, maxPage: number): Promise<ProductAll> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(mockProducts);
+      resolve({ products: mockProducts.slice(minPage, maxPage),  amount_all: mockProducts.length });
     }, 1000); // Simulate network delay
   });
 };
