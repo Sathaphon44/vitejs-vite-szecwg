@@ -1,18 +1,18 @@
 import React, { Key, useCallback, useState } from 'react';
-import { Box, Typography, Button, List } from '@mui/material';
+import { Box, Typography, Button, List, Slide, useScrollTrigger } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 // TODO: Import CartItem component and necessary hooks
 import { useCartDispatch, useCartState } from '../contexts/CardContext';
 import { CartItem } from './CartItem';
 import { CartItem as CartItemType } from '../types';
-import { ModalBuy } from './ModalBuy';
+import { ModalBuyCart } from './ModalBuyCart';
 
-export const ShoppingCart: React.FC = () => {
+export const ShoppingCart: React.FC = React.memo(() => {
   // TODO: Implement hooks to access cart state and dispatch
-  const [open, setOpen] = useState(false);
   const dispatch = useCartDispatch();
   const carts = useCartState();
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   // TODO: Implement removeItem function
   const handleRemoveItem = useCallback(
@@ -23,7 +23,7 @@ export const ShoppingCart: React.FC = () => {
   );
 
   // TODO: Implement updateQuantity function
-  function handleUpdateQuantity(productId: number, newQuantity: number) {
+  const handleUpdateQuantity = (productId: number, newQuantity: number) => {
     dispatch({
       type: 'UPDATE_QUANTITY',
       payload: { id: productId, quantity: newQuantity },
@@ -36,7 +36,7 @@ export const ShoppingCart: React.FC = () => {
   }
 
   // TODO: Calculate total price
-  function handleCalculatePrice() {
+  const handleCalculatePrice = () => {
     let totalPrice = 0;
     carts.items.map((item: CartItemType) => {
       totalPrice = totalPrice + item.price * item.quantity;
@@ -44,26 +44,28 @@ export const ShoppingCart: React.FC = () => {
     return <Typography>{`total price: $${totalPrice.toFixed(2)}`}</Typography>;
   }
 
-  const handleOpenModal = () => {
-    setOpen(true);
-  };
 
-  const handleCloseModal = () => {
-    setOpen(false);
-  };
+  const handlePayment = (): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      try {
+        setTimeout(() => {
+          dispatch({ type: "CLEAR_CART" })
+          resolve(true)
+        }, 2000)
+      } catch (error) {
+        reject(false)
+      }
+    })
+  }
+
 
   return (
     <Box>
-      <ModalBuy
-        items={carts.items}
-        open={open}
-        handleClose={handleCloseModal}
-      />
       <Typography variant="h5" gutterBottom>
         <ShoppingCartIcon sx={{ mr: 2 }} />
         Shopping Cart
       </Typography>
-      <List>
+      <List sx={{ maxHeight: 500, overflow: 'auto' }}>
         {
           /* TODO: Render cart items */
           carts.items.length > 0 ? (
@@ -102,20 +104,25 @@ export const ShoppingCart: React.FC = () => {
         </Box>
         <Box sx={{ mt: 2 }}>
           {
-            /* TODO: Implement Clear Cart button */
             <Button
-              disabled={carts.items.length == 0}
               variant="contained"
-              onClick={handleOpenModal}
+              disabled={carts.items.length == 0}
+              onClick={() => { setOpenModal(true) }}
             >
               buy
             </Button>
           }
         </Box>
       </Box>
+      <ModalBuyCart
+        items={carts.items}
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        handlePayment={handlePayment}
+      />
     </Box>
   );
-};
+});
 
 // Requirements for live coding interview:
 // 1. Import and use the necessary hooks from the CartContext

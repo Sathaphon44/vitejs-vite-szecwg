@@ -127,7 +127,8 @@ const mockProducts: Product[] = [
 export const fetchProducts = (minPage: number, maxPage: number): Promise<ProductAll> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({ products: mockProducts.slice(minPage, maxPage),  amount_all: mockProducts.length });
+      let response = { products: mockProducts.slice(minPage, maxPage),  amount_all: mockProducts.length };
+      resolve(response);
     }, 1000); // Simulate network delay
   });
 };

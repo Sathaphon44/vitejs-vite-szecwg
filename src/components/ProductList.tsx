@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Key } from 'react';
+import React, { useState, useEffect, Key, useCallback } from 'react';
 import {
   Grid,
   Card,
@@ -10,6 +10,7 @@ import {
   Alert,
   CardMedia,
   Pagination,
+  Box,
 } from '@mui/material';
 import { Product } from '../types';
 
@@ -49,24 +50,41 @@ export const ProductList: React.FC = React.memo(() => {
 
     loadProducts();
   }, [page]);
-  
-  
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, []);
+
   const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
     setMinContent((value - 1) * amountContent)
     setMaxContent(value * amountContent)
     setPage(value);
+    scrollToTop()
   };
 
 
   // TODO: Implement addToCart function
   const addProductToCart = (product: Product) => {
     dispatch({ type: 'ADD_ITEM', payload: product });
-  };  
+  };
 
 
   // TODO: Implement loading state UI
   if (loading) {
-    return <CircularProgress/>;
+    return (
+      <Box
+        width='100%'
+        height='500px'
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
 
@@ -76,22 +94,27 @@ export const ProductList: React.FC = React.memo(() => {
   }
 
 
-
   return (
-    <Grid container spacing={4}>
+    <Grid container spacing={1}>
       {
         /* TODO: Map through products and render product cards */
-        products.length > 0 ? (
+        products.length > 0 && (
           products.map((product: Product, index: Key) => (
             <Grid item key={index} xs={6} md={3} >
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.01)',
+                  boxShadow: 6,
+                },
+              }}>
                 <CardMedia
                   sx={{ p: 3, display: 'flex', justifyContent: "center", alignContent: "center" }}
                   component={"img"}
                   src={product.image}
                   alt={product.name}
                 />
-                <CardContent>
+                <CardContent sx={{ gap: 5 }}>
                   <Typography>{product.name}</Typography>
                   <Typography>{`$${product.price.toFixed(2)}`}</Typography>
                 </CardContent>
@@ -106,19 +129,28 @@ export const ProductList: React.FC = React.memo(() => {
               </Card>
             </Grid>
           ))
-        ) : (
-          <Typography>ยังไม่มี product</Typography>
         )
       }
-      <Pagination
-        sx={{ width: "100%", pt: 1, display: 'flex', justifyContent: "center" }}
-        count={Math.ceil(totalPage / amountContent)}
-        variant="outlined"
-        onChange={handleChangePage}
-        page={page}
-        defaultPage={1}
-      />
-    </Grid>
+      {
+        products.length == 0 && (
+          <Grid item>
+            <Typography>No products available</Typography>
+          </Grid>
+        )
+      }
+      {
+        products.length > 0 &&
+        <Grid item sx={{ width: "100%", pt: 1, display: 'flex', justifyContent: "center" }}>
+          <Pagination
+            count={Math.ceil(totalPage / amountContent)}
+            variant="outlined"
+            onChange={handleChangePage}
+            page={page}
+            defaultPage={1}
+          />
+        </Grid>
+      }
+    </Grid >
   );
 });
 
