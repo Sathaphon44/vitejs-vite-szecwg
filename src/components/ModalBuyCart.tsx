@@ -1,4 +1,4 @@
-import { Alert, Box, Button, CircularProgress, Modal, Typography } from "@mui/material";
+import { Alert, Backdrop, Box, Button, CircularProgress, Modal, Typography } from "@mui/material";
 import React, { useCallback } from "react";
 import { CartItem } from "../types";
 
@@ -36,7 +36,7 @@ export const ModalBuyCart: React.FC<ModalBuyCartProps> = React.memo(({ items, op
             totalPrice = totalPrice + item.price * item.quantity;
         });
         return <Typography sx={{ mt: 2 }}>{`total price: $${totalPrice.toFixed(2)}`}</Typography>;
-    }, []);
+    }, [items]);
 
     const handleConfirmButton = useCallback(async () => {
         setCloseButton(true);
@@ -61,7 +61,6 @@ export const ModalBuyCart: React.FC<ModalBuyCartProps> = React.memo(({ items, op
     return (
         <Modal
             open={open}
-            onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -117,6 +116,7 @@ export const ModalBuyCart: React.FC<ModalBuyCartProps> = React.memo(({ items, op
                                 variant="outlined"
                                 color="error"
                                 disabled={closeButton}
+                                onClick={handleClose}
                             >close</Button>
                             <Button
                                 sx={{ mt: 3 }}
